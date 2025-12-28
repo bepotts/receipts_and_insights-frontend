@@ -1,4 +1,1 @@
-Front end for the receipts and insights application
-=====
-
-
+# Front end for the receipts and insights application
