@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "caddy": "caddy run --config Caddyfile",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",

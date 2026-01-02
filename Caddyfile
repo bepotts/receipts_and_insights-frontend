@@ -1,0 +1,28 @@
+# Caddyfile for Next.js application
+# For local development, use: localhost
+
+#example.com {
+    # Reverse proxy to Next.js server
+#    reverse_proxy localhost:3000 {
+        # Preserve the original host header
+#        header_up Host {host}
+#        header_up X-Real-IP {remote_host}
+#        header_up X-Forwarded-For {remote_host}
+#        header_up X-Forwarded-Proto {scheme}
+#    }
+
+    # Enable compression
+#    encode gzip zstd
+
+#    # Logging
+#    log {
+#        output file /var/log/caddy/access.log
+#        format json
+#    }
+#}
+
+# Configuration for localhost development:
+localhost {
+     reverse_proxy localhost:3000
+}
+
