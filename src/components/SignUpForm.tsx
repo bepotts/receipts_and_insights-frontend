@@ -2,16 +2,19 @@
 
 import { useState } from "react";
 import validator from "validator";
+import { User } from "@/types/user";
 
 interface FormData {
-  name: string;
+  firstName: string;
+  lastName: string;
   email: string;
   password: string;
   confirmPassword: string;
 }
 
 interface FormErrors {
-  name?: string;
+  firstName?: string;
+  lastName?: string;
   email?: string;
   password?: string;
   confirmPassword?: string;
@@ -19,7 +22,8 @@ interface FormErrors {
 
 export default function SignUpForm() {
   const [formData, setFormData] = useState<FormData>({
-    name: "",
+    firstName: "",
+    lastName: "",
     email: "",
     password: "",
     confirmPassword: "",
@@ -27,6 +31,7 @@ export default function SignUpForm() {
 
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
 
   const validateEmail = (email: string): boolean => {
     return validator.isEmail(email);
@@ -35,8 +40,12 @@ export default function SignUpForm() {
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
 
-    if (!formData.name.trim()) {
-      newErrors.name = "Name is required";
+    if (!formData.firstName.trim()) {
+      newErrors.firstName = "First name is required";
+    }
+
+    if (!formData.lastName.trim()) {
+      newErrors.lastName = "Last name is required";
     }
 
     if (!formData.email.trim()) {
@@ -87,19 +96,21 @@ export default function SignUpForm() {
       }
 
       const requestBody = {
-        name: formData.name,
+        first_name: formData.firstName,
+        last_name: formData.lastName,
         email: formData.email,
         password: formData.password,
       };
 
-      console.log("Sending form data to:", `${backendUrl}/users/`);
+      console.log("Sending form data to:", `${backendUrl}/auth/login`);
       console.log("Request body:", JSON.stringify(requestBody, null, 2));
 
-      const response = await fetch(`${backendUrl}/users/`, {
+      const response = await fetch(`${backendUrl}/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: "include",
         body: JSON.stringify(requestBody),
       });
 
@@ -115,12 +126,24 @@ export default function SignUpForm() {
         );
       }
 
-      const user = await response.json();
-      console.log("Response data:", JSON.stringify(user, null, 2));
+      const responseData = await response.json();
+      console.log("Response data:", JSON.stringify(responseData, null, 2));
+
+      // Create user object with isLoggedIn set to true after successful registration
+      const newUser: User = {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        password: formData.password, // Note: In production, you wouldn't store the plain password
+        isLoggedIn: true,
+      };
+
+      setUser(newUser);
 
       // Reset form on success
       setFormData({
-        name: "",
+        firstName: "",
+        lastName: "",
         email: "",
         password: "",
         confirmPassword: "",
@@ -146,31 +169,60 @@ export default function SignUpForm() {
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-5">
-          <div>
-            <label
-              htmlFor="name"
-              className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2"
-            >
-              Full Name
-            </label>
-            <input
-              type="text"
-              id="name"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              className={`w-full px-4 py-2.5 rounded-lg border ${
-                errors.name
-                  ? "border-red-500 focus:border-red-500 focus:ring-red-500"
-                  : "border-zinc-300 dark:border-zinc-700 focus:border-black dark:focus:border-zinc-50 focus:ring-black dark:focus:ring-zinc-50"
-              } bg-white dark:bg-zinc-900 text-black dark:text-zinc-50 placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 transition-colors`}
-              placeholder="John Doe"
-            />
-            {errors.name && (
-              <p className="mt-1 text-sm text-red-600 dark:text-red-400">
-                {errors.name}
-              </p>
-            )}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label
+                htmlFor="firstName"
+                className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2"
+              >
+                First Name
+              </label>
+              <input
+                type="text"
+                id="firstName"
+                name="firstName"
+                value={formData.firstName}
+                onChange={handleChange}
+                className={`w-full px-4 py-2.5 rounded-lg border ${
+                  errors.firstName
+                    ? "border-red-500 focus:border-red-500 focus:ring-red-500"
+                    : "border-zinc-300 dark:border-zinc-700 focus:border-black dark:focus:border-zinc-50 focus:ring-black dark:focus:ring-zinc-50"
+                } bg-white dark:bg-zinc-900 text-black dark:text-zinc-50 placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 transition-colors`}
+                placeholder="John"
+              />
+              {errors.firstName && (
+                <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                  {errors.firstName}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label
+                htmlFor="lastName"
+                className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2"
+              >
+                Last Name
+              </label>
+              <input
+                type="text"
+                id="lastName"
+                name="lastName"
+                value={formData.lastName}
+                onChange={handleChange}
+                className={`w-full px-4 py-2.5 rounded-lg border ${
+                  errors.lastName
+                    ? "border-red-500 focus:border-red-500 focus:ring-red-500"
+                    : "border-zinc-300 dark:border-zinc-700 focus:border-black dark:focus:border-zinc-50 focus:ring-black dark:focus:ring-zinc-50"
+                } bg-white dark:bg-zinc-900 text-black dark:text-zinc-50 placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 transition-colors`}
+                placeholder="Doe"
+              />
+              {errors.lastName && (
+                <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                  {errors.lastName}
+                </p>
+              )}
+            </div>
           </div>
 
           <div>
@@ -272,6 +324,62 @@ export default function SignUpForm() {
             Sign in
           </a>
         </p>
+
+        {user && (
+          <div className="mt-6 p-4 bg-zinc-100 dark:bg-zinc-800 rounded-lg border border-zinc-200 dark:border-zinc-700">
+            <h3 className="text-lg font-semibold text-black dark:text-zinc-50 mb-3">
+              User Information
+            </h3>
+            <div className="space-y-2 text-sm">
+              <p>
+                <span className="font-medium text-zinc-700 dark:text-zinc-300">
+                  First Name:
+                </span>{" "}
+                <span className="text-zinc-900 dark:text-zinc-50">
+                  {user.firstName}
+                </span>
+              </p>
+              <p>
+                <span className="font-medium text-zinc-700 dark:text-zinc-300">
+                  Last Name:
+                </span>{" "}
+                <span className="text-zinc-900 dark:text-zinc-50">
+                  {user.lastName}
+                </span>
+              </p>
+              <p>
+                <span className="font-medium text-zinc-700 dark:text-zinc-300">
+                  Email:
+                </span>{" "}
+                <span className="text-zinc-900 dark:text-zinc-50">
+                  {user.email}
+                </span>
+              </p>
+              <p>
+                <span className="font-medium text-zinc-700 dark:text-zinc-300">
+                  Password:
+                </span>{" "}
+                <span className="text-zinc-900 dark:text-zinc-50">
+                  ••••••••
+                </span>
+              </p>
+              <p>
+                <span className="font-medium text-zinc-700 dark:text-zinc-300">
+                  Is Logged In:
+                </span>{" "}
+                <span
+                  className={`${
+                    user.isLoggedIn
+                      ? "text-green-600 dark:text-green-400"
+                      : "text-red-600 dark:text-red-400"
+                  }`}
+                >
+                  {user.isLoggedIn ? "Yes" : "No"}
+                </span>
+              </p>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
