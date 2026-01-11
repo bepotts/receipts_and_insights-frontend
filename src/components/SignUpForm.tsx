@@ -32,6 +32,9 @@ export default function SignUpForm() {
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [user, setUser] = useState<User | null>(null);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_API_URL;
 
   const validateEmail = (email: string): boolean => {
     return validator.isEmail(email);
@@ -89,8 +92,6 @@ export default function SignUpForm() {
     setIsSubmitting(true);
 
     try {
-      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_API_URL;
-
       if (!backendUrl) {
         throw new Error("Backend URL is not configured");
       }
@@ -102,10 +103,12 @@ export default function SignUpForm() {
         password: formData.password,
       };
 
-      console.log("Sending form data to:", `${backendUrl}/auth/login`);
+      const loginUrl = `${backendUrl}/auth/login`;
+
+      console.log("Sending form data to:", loginUrl);
       console.log("Request body:", JSON.stringify(requestBody, null, 2));
 
-      const response = await fetch(`${backendUrl}/auth/login`, {
+      const response = await fetch(loginUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -134,7 +137,7 @@ export default function SignUpForm() {
         firstName: formData.firstName,
         lastName: formData.lastName,
         email: formData.email,
-        password: formData.password, // Note: In production, you wouldn't store the plain password
+        password: formData.password,
         isLoggedIn: true,
       };
 
@@ -161,12 +164,76 @@ export default function SignUpForm() {
     }
   };
 
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+
+    try {
+      if (!backendUrl) {
+        throw new Error("Backend URL is not configured");
+      }
+
+      const logoutUrl = `${backendUrl}/auth/logout`;
+
+      console.log("Logging out:", logoutUrl);
+
+      const response = await fetch(logoutUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      });
+
+      console.log(
+        "Logout response status:",
+        response.status,
+        response.statusText,
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({
+          message: "Failed to logout",
+        }));
+        console.log("Error response:", JSON.stringify(errorData, null, 2));
+        throw new Error(
+          errorData.message || `Server error: ${response.status}`,
+        );
+      }
+
+      // Clear user state after successful logout
+      setUser(null);
+      console.log("User logged out successfully");
+      alert("Logged out successfully!");
+    } catch (error) {
+      console.error("Error logging out:", error);
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Failed to logout. Please try again.";
+      alert(errorMessage);
+    } finally {
+      setIsLoggingOut(false);
+    }
+  };
+
   return (
     <div className="w-full max-w-md mx-auto">
       <div className="bg-white dark:bg-black border border-zinc-200 dark:border-zinc-800 rounded-lg shadow-sm p-8">
-        <h2 className="text-2xl font-semibold text-black dark:text-zinc-50 mb-6 text-center">
-          Create an Account
-        </h2>
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-semibold text-black dark:text-zinc-50 text-center flex-1">
+            Create an Account
+          </h2>
+          {user && (
+            <button
+              type="button"
+              onClick={handleLogout}
+              disabled={isLoggingOut}
+              className="ml-4 py-2 px-4 rounded-lg bg-red-600 text-white font-medium hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+            >
+              {isLoggingOut ? "Logging out..." : "Logout"}
+            </button>
+          )}
+        </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div className="grid grid-cols-2 gap-4">
