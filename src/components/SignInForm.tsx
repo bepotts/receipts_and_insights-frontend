@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import validator from "validator";
+import { routes } from "@/config/routes";
 import { User } from "@/types/user";
 
 interface FormData {
@@ -65,10 +66,7 @@ export default function SignInForm() {
     setIsSubmitting(true);
 
     try {
-      const loginUrl = process.env.NEXT_PUBLIC_LOGIN_ROUTE;
-      if (!loginUrl) {
-        throw new Error("Login URL is not configured");
-      }
+      const loginUrl = routes.login;
 
       const requestBody = {
         email: formData.email,
@@ -126,10 +124,7 @@ export default function SignInForm() {
     setIsLoggingOut(true);
 
     try {
-      const logoutUrl = process.env.NEXT_PUBLIC_LOGOUT_ROUTE;
-      if (!logoutUrl) {
-        throw new Error("Logout URL is not configured");
-      }
+      const logoutUrl = routes.logout;
 
       const response = await fetch(logoutUrl, {
         method: "POST",

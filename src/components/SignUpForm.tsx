@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import validator from "validator";
+import { routes } from "@/config/routes";
 import { User } from "@/types/user";
 
 interface FormData {
@@ -97,15 +98,12 @@ export default function SignUpForm() {
         password: formData.password,
       };
 
-      const loginUrl = process.env.NEXT_PUBLIC_REGISTER_ROUTE;
-      if (!loginUrl) {
-        throw new Error("Register URL is not configured");
-      }
+      const registerUrl = routes.register;
 
-      console.log("Sending form data to:", loginUrl);
+      console.log("Sending form data to:", registerUrl);
       console.log("Request body:", JSON.stringify(requestBody, null, 2));
 
-      const response = await fetch(loginUrl, {
+      const response = await fetch(registerUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -165,10 +163,7 @@ export default function SignUpForm() {
     setIsLoggingOut(true);
 
     try {
-      const logoutUrl = process.env.NEXT_PUBLIC_LOGOUT_ROUTE;
-      if (!logoutUrl) {
-        throw new Error("Logout URL is not configured");
-      }
+      const logoutUrl = routes.logout;
 
       const response = await fetch(logoutUrl, {
         method: "POST",
