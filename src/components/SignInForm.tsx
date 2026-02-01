@@ -26,8 +26,6 @@ export default function SignInForm() {
   const [user, setUser] = useState<User | null>(null);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
-  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_API_URL;
-
   const validateEmail = (email: string): boolean => {
     return validator.isEmail(email);
   };
@@ -67,16 +65,15 @@ export default function SignInForm() {
     setIsSubmitting(true);
 
     try {
-      if (!backendUrl) {
-        throw new Error("Backend URL is not configured");
+      const loginUrl = process.env.NEXT_PUBLIC_LOGIN_ROUTE;
+      if (!loginUrl) {
+        throw new Error("Login URL is not configured");
       }
 
       const requestBody = {
         email: formData.email,
         password: formData.password,
       };
-
-      const loginUrl = `${backendUrl}/auth/login`;
 
       const response = await fetch(loginUrl, {
         method: "POST",
@@ -129,11 +126,10 @@ export default function SignInForm() {
     setIsLoggingOut(true);
 
     try {
-      if (!backendUrl) {
-        throw new Error("Backend URL is not configured");
+      const logoutUrl = process.env.NEXT_PUBLIC_LOGOUT_ROUTE;
+      if (!logoutUrl) {
+        throw new Error("Logout URL is not configured");
       }
-
-      const logoutUrl = `${backendUrl}/auth/logout`;
 
       const response = await fetch(logoutUrl, {
         method: "POST",
