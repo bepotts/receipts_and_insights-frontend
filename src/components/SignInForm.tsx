@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import validator from "validator";
+import { useUser } from "@/contexts/UserContext";
 import { routes } from "@/config/routes";
 import { User } from "@/types/user";
 
@@ -17,6 +19,7 @@ interface FormErrors {
 }
 
 export default function SignInForm() {
+  const router = useRouter();
   const [formData, setFormData] = useState<FormData>({
     email: "",
     password: "",
@@ -24,7 +27,7 @@ export default function SignInForm() {
 
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
+  const { user, setUser } = useUser();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const validateEmail = (email: string): boolean => {
@@ -97,7 +100,6 @@ export default function SignInForm() {
         firstName: responseData.first_name ?? responseData.firstName ?? "",
         lastName: responseData.last_name ?? responseData.lastName ?? "",
         email: formData.email,
-        password: formData.password,
         isLoggedIn: true,
       };
 
@@ -108,6 +110,7 @@ export default function SignInForm() {
         password: "",
       });
       alert("Signed in successfully!");
+      router.push(routes.landing);
     } catch (error) {
       console.error("Error signing in:", error);
       const errorMessage =

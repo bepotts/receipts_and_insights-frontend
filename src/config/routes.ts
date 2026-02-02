@@ -27,4 +27,8 @@ export const routes = {
   get logout(): string {
     return process.env.NEXT_PUBLIC_LOGOUT_ROUTE ?? `${apiBaseUrl}/auth/logout`;
   },
+
+  /** App route paths (for client-side navigation). */
+  home: "/",
+  landing: "/landing",
 } as const;

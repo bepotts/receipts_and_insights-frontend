@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import validator from "validator";
+import { useUser } from "@/contexts/UserContext";
 import { routes } from "@/config/routes";
 import { User } from "@/types/user";
 
@@ -32,7 +33,7 @@ export default function SignUpForm() {
 
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
+  const { user, setUser } = useUser();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const validateEmail = (email: string): boolean => {
@@ -132,7 +133,6 @@ export default function SignUpForm() {
         firstName: formData.firstName,
         lastName: formData.lastName,
         email: formData.email,
-        password: formData.password,
         isLoggedIn: true,
       };
 
