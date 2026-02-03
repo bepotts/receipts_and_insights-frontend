@@ -244,12 +244,12 @@ export default function SignInForm() {
         </form>
 
         <p className="mt-6 text-center text-sm text-zinc-600 dark:text-zinc-400">
-          Don&apos;t have an account?{" "}
+          Looking to create an account?{" "}
           <Link
             href="/signup"
             className="font-medium text-black dark:text-zinc-50 hover:underline"
           >
-            Sign up
+            Create one here
           </Link>
         </p>
 
