@@ -27,7 +27,7 @@ export default function SignInForm() {
 
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { user, setUser } = useUser();
+  const { user, setUser, logout } = useUser();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const validateEmail = (email: string): boolean => {
@@ -127,26 +127,7 @@ export default function SignInForm() {
     setIsLoggingOut(true);
 
     try {
-      const logoutUrl = routes.logout;
-
-      const response = await fetch(logoutUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({
-          message: "Failed to logout",
-        }));
-        throw new Error(
-          errorData.message || `Server error: ${response.status}`,
-        );
-      }
-
-      setUser(null);
+      await logout();
       alert("Logged out successfully!");
     } catch (error) {
       console.error("Error logging out:", error);
