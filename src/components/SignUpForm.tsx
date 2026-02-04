@@ -3,8 +3,11 @@
 import { useState } from "react";
 import validator from "validator";
 import { useUser } from "@/contexts/UserContext";
-import { routes } from "@/config/routes";
 import { User } from "@/types/user";
+import {
+  register as registerRequest,
+  logout as logoutRequest,
+} from "@/api/requests";
 
 interface FormData {
   firstName: string;
@@ -92,43 +95,13 @@ export default function SignUpForm() {
     setIsSubmitting(true);
 
     try {
-      const requestBody = {
+      await registerRequest({
         first_name: formData.firstName,
         last_name: formData.lastName,
         email: formData.email,
         password: formData.password,
-      };
-
-      const registerUrl = routes.register;
-
-      console.log("Sending form data to:", registerUrl);
-      console.log("Request body:", JSON.stringify(requestBody, null, 2));
-
-      const response = await fetch(registerUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify(requestBody),
       });
 
-      console.log("Response status:", response.status, response.statusText);
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({
-          message: "Failed to create account",
-        }));
-        console.log("Error response:", JSON.stringify(errorData, null, 2));
-        throw new Error(
-          errorData.message || `Server error: ${response.status}`,
-        );
-      }
-
-      const responseData = await response.json();
-      console.log("Response data:", JSON.stringify(responseData, null, 2));
-
-      // Create user object with isLoggedIn set to true after successful registration
       const newUser: User = {
         firstName: formData.firstName,
         lastName: formData.lastName,
@@ -163,35 +136,8 @@ export default function SignUpForm() {
     setIsLoggingOut(true);
 
     try {
-      const logoutUrl = routes.logout;
-
-      const response = await fetch(logoutUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-      });
-
-      console.log(
-        "Logout response status:",
-        response.status,
-        response.statusText,
-      );
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({
-          message: "Failed to logout",
-        }));
-        console.log("Error response:", JSON.stringify(errorData, null, 2));
-        throw new Error(
-          errorData.message || `Server error: ${response.status}`,
-        );
-      }
-
-      // Clear user state after successful logout
+      await logoutRequest();
       setUser(null);
-      console.log("User logged out successfully");
       alert("Logged out successfully!");
     } catch (error) {
       console.error("Error logging out:", error);

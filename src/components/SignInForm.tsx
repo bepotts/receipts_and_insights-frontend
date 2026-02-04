@@ -7,6 +7,7 @@ import validator from "validator";
 import { useUser } from "@/contexts/UserContext";
 import { routes } from "@/config/routes";
 import { User } from "@/types/user";
+import { login as loginRequest } from "@/api/requests";
 
 interface FormData {
   email: string;
@@ -69,32 +70,10 @@ export default function SignInForm() {
     setIsSubmitting(true);
 
     try {
-      const loginUrl = routes.login;
-
-      const requestBody = {
-        email: formData.email,
-        password: formData.password,
-      };
-
-      const response = await fetch(loginUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify(requestBody),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({
-          message: "Failed to sign in",
-        }));
-        throw new Error(
-          errorData.message || `Server error: ${response.status}`,
-        );
-      }
-
-      const responseData = await response.json();
+      const responseData = await loginRequest(
+        formData.email,
+        formData.password,
+      );
 
       const newUser: User = {
         firstName: responseData.first_name ?? responseData.firstName ?? "",
