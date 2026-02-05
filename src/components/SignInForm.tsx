@@ -8,6 +8,7 @@ import { useUser } from "@/contexts/UserContext";
 import { routes } from "@/config/routes";
 import { User } from "@/types/user";
 import { login as loginRequest } from "@/api/requests";
+import { logger } from "@/lib/logger";
 
 interface FormData {
   email: string;
@@ -91,7 +92,7 @@ export default function SignInForm() {
       alert("Signed in successfully!");
       router.push(routes.landing);
     } catch (error) {
-      console.error("Error signing in:", error);
+      logger.error({ err: error }, "Error signing in");
       const errorMessage =
         error instanceof Error
           ? error.message
@@ -109,7 +110,7 @@ export default function SignInForm() {
       await logout();
       alert("Logged out successfully!");
     } catch (error) {
-      console.error("Error logging out:", error);
+      logger.error({ err: error }, "Error logging out");
       const errorMessage =
         error instanceof Error
           ? error.message

@@ -8,6 +8,7 @@ import {
   register as registerRequest,
   logout as logoutRequest,
 } from "@/api/requests";
+import { logger } from "@/lib/logger";
 
 interface FormData {
   firstName: string;
@@ -121,7 +122,7 @@ export default function SignUpForm() {
       });
       alert("Account created successfully!");
     } catch (error) {
-      console.error("Error creating account:", error);
+      logger.error({ err: error }, "Error creating account");
       const errorMessage =
         error instanceof Error
           ? error.message
@@ -140,7 +141,7 @@ export default function SignUpForm() {
       setUser(null);
       alert("Logged out successfully!");
     } catch (error) {
-      console.error("Error logging out:", error);
+      logger.error({ err: error }, "Error logging out");
       const errorMessage =
         error instanceof Error
           ? error.message
