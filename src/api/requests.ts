@@ -50,6 +50,28 @@ export async function register(
   return response.json();
 }
 
+export async function uploadPhotos(
+  files: File[],
+): Promise<Record<string, unknown>> {
+  const formData = new FormData();
+  files.forEach((file) => formData.append("file", file));
+
+  const response = await fetch(routes.photoUpload, {
+    method: "POST",
+    credentials: "include",
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const errorData = await response
+      .json()
+      .catch(() => ({ message: "Failed to upload photos" }));
+    throw new Error(errorData.message || `Upload failed: ${response.status}`);
+  }
+
+  return response.json();
+}
+
 export async function logout(options?: LogoutOptions): Promise<void> {
   const response = await fetch(routes.logout, {
     method: "POST",

@@ -28,6 +28,12 @@ export const routes = {
     return process.env.NEXT_PUBLIC_LOGOUT_ROUTE ?? `${apiBaseUrl}/auth/logout`;
   },
 
+  get photoUpload(): string {
+    return (
+      process.env.NEXT_PUBLIC_PHOTO_UPLOAD_ROUTE ?? `${apiBaseUrl}/photo_upload`
+    );
+  },
+
   /** App route paths (for client-side navigation). */
   home: "/",
   landing: "/landing",
