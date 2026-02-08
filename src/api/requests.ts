@@ -72,6 +72,25 @@ export async function uploadPhotos(
   return response.json();
 }
 
+export async function getAllPhotos(): Promise<unknown[]> {
+  const response = await fetch(routes.photoGetAll, {
+    method: "GET",
+    credentials: "include",
+  });
+
+  if (!response.ok) {
+    const errorData = await response
+      .json()
+      .catch(() => ({ message: "Failed to fetch photos" }));
+    throw new Error(
+      errorData.message || `Failed to fetch photos: ${response.status}`,
+    );
+  }
+
+  const data = await response.json();
+  return Array.isArray(data) ? data : (data?.photos ?? []);
+}
+
 export async function logout(options?: LogoutOptions): Promise<void> {
   const response = await fetch(routes.logout, {
     method: "POST",

@@ -34,6 +34,12 @@ export const routes = {
     );
   },
 
+  get photoGetAll(): string {
+    return (
+      process.env.NEXT_PUBLIC_PHOTO_GET_ALL_ROUTE ?? `${apiBaseUrl}/photos`
+    );
+  },
+
   /** App route paths (for client-side navigation). */
   home: "/",
   landing: "/landing",
